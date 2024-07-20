@@ -1,5 +1,5 @@
-const apiKey = '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'; // Replace with your Hugging Face API key
-const apiUrl = 'https://api-inference.huggingface.co/models/gpt2';
+const apiKey = 'iOVf3dNxrDibqnqu3ypSYU2y1WvOQ2gHc4EmuOcg'; // Replace with your Cohere API key
+const apiUrl = 'https://api.cohere.ai/v1/generate';
 
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
@@ -16,16 +16,27 @@ sendButton.addEventListener('click', () => {
 
 async function sendMessage(message) {
     try {
+        const prompt = `The following is a conversation between a user and an AI assistant. The AI assistant is helpful, creative, clever, and very friendly.\n\nUser: ${message}\nAI:`;
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`
             },
-            body: JSON.stringify({ inputs: message })
+            body: JSON.stringify({
+                prompt: prompt,
+                max_tokens: 50,
+                temperature: 0.7,
+                k: 0,
+                p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0,
+                stop_sequences: ["\n"]
+            })
         });
         const data = await response.json();
-        addMessage('ai', data[0].generated_text.trim());
+        const aiResponse = data.text.trim();
+        addMessage('ai', aiResponse);
     } catch (error) {
         console.error('Error:', error);
     }
